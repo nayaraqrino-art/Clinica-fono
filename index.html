@@ -1,12 +1,656 @@
+cat > /mnt/user-data/outputs/index.html << 'ENDHTML'
 <!DOCTYPE html>
-<html lang='pt-BR'><head><meta charset='UTF-8'><meta name='viewport' content='width=device-width,initial-scale=1'>
-<title>Clínica Fono</title><link rel='stylesheet' href='styles.css'></head>
-<body><div class='container'><header><h1>Clínica Fono</h1><p>Painel profissional</p></header>
-<div class='grid'>
-<section class='card'><h2>Login</h2><input placeholder='Email'><input placeholder='Senha' type='password'><button>Entrar</button></section>
-<section class='card'><h2>Cadastro de Pacientes</h2><input placeholder='Nome'><input placeholder='Idade'><textarea placeholder='Observações'></textarea><button>Salvar</button></section>
-<section class='card'><h2>Agenda</h2><ul><li>08:00 - João</li><li>10:00 - Maria</li><li>14:00 - Pedro</li></ul></section>
-<section class='card'><h2>Evolução Fonoaudiológica</h2><textarea placeholder='Registrar evolução'></textarea><button>Registrar</button></section>
-<section class='card'><h2>Anamnese</h2><textarea placeholder='Histórico do paciente'></textarea></section>
-<section class='card'><h2>Financeiro</h2><p>Receitas: R$ 0,00</p><p>Despesas: R$ 0,00</p></section>
-</div></div></body></html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>NQ Fono — Nayara Querino</title>
+<script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,300;0,400;0,500;1,300&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ivory:#f9f6f1;--petal:#f2e4de;--blush:#e8cfc7;--dusty:#c4806f;--rose:#b06055;--wine:#8c4a41;
+  --bark:#4a3f3a;--stone:#6b5e58;--mist:#c8bdb9;
+  --shadow:0 4px 28px rgba(74,63,58,.11);--shadow-lg:0 8px 48px rgba(74,63,58,.16);
+  --r:20px;--rs:14px;
+}
+body{font-family:'Jost',sans-serif;background:var(--ivory);color:var(--bark)}
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-thumb{background:var(--mist);border-radius:3px}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes bounce{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-6px)}}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+.fade-up{animation:fadeUp .32s ease forwards}
+.login-bg{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(145deg,#f9f6f1,#f2e4de,#e8cfc7);padding:24px}
+.login-card{background:rgba(255,255,255,.95);border-radius:32px;padding:52px 44px;width:100%;max-width:440px;box-shadow:var(--shadow-lg);border:1px solid rgba(196,128,111,.15)}
+.login-logo h1{font-family:'Playfair Display',serif;font-size:3rem;font-weight:300;color:var(--bark);text-align:center;letter-spacing:-.01em}
+.login-logo .sub{font-size:.68rem;letter-spacing:.35em;text-transform:uppercase;color:var(--dusty);text-align:center;margin-top:5px}
+.login-logo .prof{font-size:.82rem;color:var(--stone);text-align:center;margin-top:8px;font-style:italic;font-family:'Playfair Display',serif}
+.ornament{display:flex;align-items:center;gap:12px;margin:16px 0;color:var(--mist)}
+.ornament::before,.ornament::after{content:'';flex:1;height:1px;background:linear-gradient(to right,transparent,var(--blush),transparent)}
+.field{position:relative;margin-bottom:13px}
+.field input{width:100%;padding:13px 15px 13px 42px;border:1.5px solid var(--mist);border-radius:var(--rs);font-family:'Jost',sans-serif;font-size:.9rem;color:var(--bark);background:var(--ivory);transition:all .2s;outline:none}
+.field input:focus{border-color:var(--dusty);background:#fff;box-shadow:0 0 0 3px rgba(196,128,111,.1)}
+.field input::placeholder{color:var(--mist)}
+.field-ico{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--mist)}
+.btn-login{width:100%;padding:14px;background:linear-gradient(135deg,var(--dusty),var(--rose));color:#fff;border:none;border-radius:var(--rs);font-family:'Jost',sans-serif;font-size:.9rem;font-weight:500;cursor:pointer;transition:all .2s}
+.btn-login:hover{background:linear-gradient(135deg,var(--rose),var(--wine));transform:translateY(-1px)}
+.btn-login:disabled{opacity:.6;cursor:not-allowed}
+.err{color:var(--wine);font-size:.8rem;text-align:center;margin-top:10px;padding:9px;background:rgba(140,74,65,.06);border-radius:8px;border:1px solid rgba(140,74,65,.15)}
+.sec{display:flex;align-items:center;gap:7px;font-size:.7rem;color:var(--stone);justify-content:center;margin-top:18px}
+.sec-dot{width:7px;height:7px;border-radius:50%;background:#4caf50;animation:pulse 2s infinite}
+.app{display:grid;grid-template-columns:260px 1fr;min-height:100vh}
+@media(max-width:860px){.app{grid-template-columns:1fr}.sidebar{display:none}}
+.sidebar{background:#fff;border-right:1px solid rgba(196,128,111,.1);padding:26px 17px;display:flex;flex-direction:column;gap:4px;position:sticky;top:0;height:100vh;overflow-y:auto}
+.
+✦✦✦✦✦✦✦✦✦✦✦
+
+sb-brand{padding:0 6px 20px;border-bottom:1px solid var(--petal);margin-bottom:6px}
+.sb-brand h2{font-family:'Playfair Display',serif;font-size:1.7rem;font-weight:400;color:var(--bark)}
+.sb-brand p{font-size:.62rem;letter-spacing:.28em;text-transform:uppercase;color:var(--dusty);margin-top:2px}
+.nav{display:flex;align-items:center;gap:10px;padding:11px 13px;border-radius:var(--rs);cursor:pointer;font-size:.85rem;color:var(--stone);border:none;background:transparent;width:100%;text-align:left;transition:all .17s;font-family:'Jost',sans-serif}
+.nav:hover{background:var(--petal);color:var(--bark)}
+.nav.on{background:linear-gradient(135deg,var(--dusty),var(--rose));color:#fff;font-weight:500}
+.sb-foot{margin-top:auto;padding-top:14px;border-top:1px solid var(--petal)}
+.sb-prof strong{display:block;font-size:.82rem;color:var(--bark);font-weight:500}
+.sb-prof span{font-size:.73rem;color:var(--stone)}
+.sync{display:flex;align-items:center;gap:6px;font-size:.7rem;color:var(--stone);margin-bottom:9px}
+.main{background:var(--ivory);padding:28px 30px;overflow-y:auto;min-height:100vh}
+.topbar{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:26px}
+.page-title{font-family:'Playfair Display',serif;font-size:2rem;font-weight:300;color:var(--bark)}
+.page-sub{font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;color:var(--dusty);margin-top:3px}
+.card{background:#fff;border-radius:var(--r);padding:24px;box-shadow:var(--shadow);border:1px solid rgba(196,128,111,.08)}
+.card-title{font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:400;color:var(--bark);margin-bottom:16px}
+.g5{display:grid;grid-template-columns:repeat(5,1fr);gap:13px;margin-bottom:22px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:22px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+@media(max-width:1080px){.g5{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:760px){.g3,.g2{grid-template-columns:1fr}}
+.stat{background:#fff;border-radius:var(--r);padding:20px;box-shadow:var(--shadow);border:1px solid rgba(196,128,111,.08);transition:transform .2s}
+.stat:hover{transform:translateY(-2px)}
+.stat-ico{font-size:1.3rem;margin-bottom:9px}
+.stat-val{font-family:'Playfair Display',serif;font-size:2.4rem;font-weight:300;color:var(--bark);line-height:1}
+.stat-lbl{font-size:.73rem;color:var(--stone);margin-top:4px}
+.li{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border-radius:var(--rs);background:var(--ivory);margin-bottom:8px;cursor:pointer;transition:background .15s}
+.li:hover{background:var(--petal)}
+.li strong{display:block;font-size:.86rem;color:var(--bark);font-weight:500}
+.li span{font-size:.73rem;color:var(--stone)}
+.ss{font-size:.69rem;padding:3px 9px;border-radius:20px;font-weight:500}
+.sc{background:#e8f5e9;color:#2e7d32}.sa{background:#e3f2fd;color:#1565c0}.sp{background:#fff8e1;color:#e65100}.sx{background:#fce4ec;color:#c62828}
+.btn{padding:9px 17px;border-radius:var(--rs);font-family:'Jost',sans-serif;font-size:.83rem;font-weight:500;cursor:pointer;transition:all .17s;border:none}
+.br{background:linear-gradient(135deg,var(--dusty),var(--rose));color:#fff}
+.br:hover:not(:disabled){background:linear-gradient(135deg,var(--rose),var(--wine));transform:translateY(-1px)}
+.bo{background:transparent;color:var(--stone);border:1.5px solid var(--mist)}
+.bo:hover:not(:disabled){border-color:var(--dusty);color:var(--dusty)}
+.bd{background:transparent;color:#c0392b;border:1.5px solid #e8bbb8}
+.bd:hover{background:#fdf0ef}
+.bsm{padding:5px 11px;font-size:.75rem}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.inp{width:100%;padding:11px 13px;border:1.5px solid var(--mist);border-radius:var(--rs);font-family:'Jost',sans-serif;font-size:.85rem;color:var(--bark);background:var(--ivory);transition:all .2s;outline:none}
+.inp:focus{border-color:var(--dusty);background:#fff;box-shadow:0 0 0 3px rgba(196,128,111,.08)}
+.inp::placeholder{color:var(--mist)}
+textarea.inp{resize:vertical;min-height:78px}
+select.inp{appearance:none;cursor:pointer}
+label{font-size:.
+
+72rem;color:var(--stone);display:block;margin-bottom:5px}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px}
+.tab{padding:7px 15px;border-radius:20px;font-size:.79rem;font-weight:500;cursor:pointer;border:1.5px solid var(--mist);background:transparent;color:var(--stone);transition:all .17s;font-family:'Jost',sans-serif}
+.tab:hover{border-color:var(--dusty);color:var(--dusty)}
+.tab.on{background:linear-gradient(135deg,var(--dusty),var(--rose));border-color:transparent;color:#fff}
+.pc{background:#fff;border-radius:var(--rs);padding:14px 17px;border:1px solid rgba(196,128,111,.1);cursor:pointer;transition:all .17s;display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.pc:hover{border-color:var(--dusty);box-shadow:0 2px 14px rgba(196,128,111,.13);transform:translateY(-1px)}
+.pc.sel{border-color:var(--dusty);background:rgba(196,128,111,.05)}
+.chat-msgs{min-height:160px;max-height:360px;overflow-y:auto;padding:13px;background:var(--ivory);border-radius:var(--rs);margin-bottom:13px;display:flex;flex-direction:column;gap:9px}
+.msg{padding:10px 14px;border-radius:var(--rs);max-width:84%;font-size:.83rem;line-height:1.65}
+.mu{background:linear-gradient(135deg,var(--dusty),var(--rose));color:#fff;align-self:flex-end;border-radius:17px 17px 4px 17px}
+.ma{background:#fff;color:var(--bark);border:1px solid var(--mist);align-self:flex-start;border-radius:17px 17px 17px 4px}
+.ma .ai-lbl{font-size:.69rem;color:var(--dusty);font-weight:600;margin-bottom:2px;display:block}
+.ty{display:flex;gap:4px;align-items:center}
+.ty span{width:6px;height:6px;border-radius:50%;background:var(--dusty);animation:bounce 1.2s infinite}
+.ty span:nth-child(2){animation-delay:.2s}.ty span:nth-child(3){animation-delay:.4s}
+.qp{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:13px}
+.qb{padding:10px;border-radius:var(--rs);border:1.5px solid var(--mist);background:#fff;cursor:pointer;font-size:.77rem;color:var(--bark);transition:all .17s;text-align:left;font-family:'Jost',sans-serif}
+.qb:hover{border-color:var(--dusty);background:var(--petal);color:var(--rose)}
+.ar{display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:var(--rs);background:var(--ivory);margin-bottom:8px}
+.at{font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--dusty);min-width:48px}
+.fs{margin-bottom:20px}
+.fs h4{font-size:.68rem;letter-spacing:.22em;text-transform:uppercase;color:var(--dusty);margin-bottom:11px;padding-bottom:5px;border-bottom:1px solid var(--petal)}
+.ov{position:fixed;inset:0;background:rgba(74,63,58,.42);backdrop-filter:blur(5px);z-index:100;display:flex;align-items:center;justify-content:center;padding:18px}
+.mo{background:#fff;border-radius:var(--r);padding:32px;max-width:520px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:var(--shadow-lg)}
+.mo h3{font-family:'Playfair Display',serif;font-size:1.7rem;font-weight:300;color:var(--bark);margin-bottom:16px}
+.nb{position:relative;background:#fff;border:1.5px solid var(--mist);border-radius:50%;width:41px;height:41px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.98rem;transition:all .2s}
+.nb:hover{border-color:var(--dusty)}
+.nbg{position:absolute;top:-4px;right:-4px;background:var(--rose);color:#fff;border-radius:50%;width:16px;height:16px;font-size:.6rem;font-weight:600;display:flex;align-items:center;justify-content:center}
+.np{position:absolute;top:48px;right:0;background:#fff;border-radius:var(--rs);box-shadow:var(--shadow-lg);width:280px;z-index:50;border:1px solid var(--mist);overflow:hidden}
+.nh{padding:11px 14px;border-bottom:1px solid var(--petal);font-size:.79rem;font-weight:600;color:var(--bark)}
+.ni{padding:10px 14px;border-bottom:1px solid var(--petal);font-size:.79rem}
+.ni.ur{background:var(--petal)}
+.nt{font-size:.69rem;color:var(--stone);margin-top:2px}
+.rp{background:#fff;border:1px solid var(--mist);border-radius:var(--rs);padding:26px}
+.rh{border-bottom:2px solid var(--dusty);padding-bottom:13px;margin-bottom:18px}
+.rh h2{font-family:'Playfair Display',serif;font-size:1.
+
+8rem;font-weight:300;color:var(--bark)}
+.rs{margin-bottom:16px}
+.rs h4{font-size:.7rem;letter-spacing:.15em;text-transform:uppercase;color:var(--dusty);margin-bottom:5px}
+.rs p{font-size:.86rem;color:var(--bark);line-height:1.7}
+.tag{display:inline-block;padding:3px 9px;border-radius:20px;font-size:.69rem;background:var(--petal);color:var(--rose);font-weight:500}
+.dvd{height:1px;background:var(--petal);margin:16px 0}
+.sp2{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:5px}
+.load{position:fixed;inset:0;background:rgba(249,246,241,.92);z-index:200;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px}
+.load h2{font-family:'Playfair Display',serif;font-size:2.4rem;font-weight:300;color:var(--bark)}
+.load p{font-size:.72rem;letter-spacing:.22em;text-transform:uppercase;color:var(--dusty)}
+.ring{width:38px;height:38px;border:3px solid var(--petal);border-top-color:var(--dusty);border-radius:50%;animation:spin .8s linear infinite}
+.proto-badge{background:var(--petal);border-radius:var(--rs);padding:10px 14px;margin-bottom:16px;font-size:.8rem;color:var(--rose)}
+@media print{.sidebar,.topbar,.tabs,.btn,.nb{display:none!important}.main{padding:0}}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useEffect, useRef } = React;
+
+const SB_URL  = "https://updolaavohneidqrqtfp.supabase.co";
+const SB_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVwZG9sYWF2b2huZWlkcXJxdGZwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3ODk2MjYsImV4cCI6MjA5NTM2NTYyNn0.jtW8sedM4vZjICF9pQa96yrtTMXxoEEW6QpAS-t0cIo";
+const CREDS   = { email:"nayaraqrino@gmail.com", password:"Nay0101" };
+const SESSION_KEY = "nqfono_s";
+
+function hdrs(){ return {"Content-Type":"application/json","apikey":SB_ANON,"Authorization":`Bearer ${SB_ANON}`,"Prefer":"return=representation"}; }
+async function dbGet(t,f=""){const r=await fetch(`${SB_URL}/rest/v1/${t}?order=created_at.desc${f}`,{headers:hdrs()});return r.ok?r.json():[];}
+async function dbIns(t,b){const r=await fetch(`${SB_URL}/rest/v1/${t}`,{method:"POST",headers:hdrs(),body:JSON.stringify(b)});const d=await r.json();return Array.isArray(d)?d[0]:d;}
+async function dbUpd(t,id,b){await fetch(`${SB_URL}/rest/v1/${t}?id=eq.${id}`,{method:"PATCH",headers:hdrs(),body:JSON.stringify(b)});}
+async function dbDel(t,id){await fetch(`${SB_URL}/rest/v1/${t}?id=eq.${id}`,{method:"DELETE",headers:hdrs()});}
+
+const AI_SYS=`Você é a Assistente IA do NQ Fono, sistema da Fonoaudióloga Nayara Querino (CRFa 8-11873). Apoie a documentação clínica fonoaudiológica com textos profissionais e éticos. Responda em português brasileiro com linguagem técnica fonoaudiológica. Nunca invente diagnósticos. Oriente que textos devem ser revisados pela profissional.`;
+async function callAI(msgs){try{const r=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:1000,system:AI_SYS,messages:msgs})});const d=await r.json();return d?.content?.map(b=>b.type==="text"?b.text:"").join("\n")||"Erro ao gerar.";}catch{return"Erro de conexão.";}}
+
+const AREAS=["Linguagem Infantil","Atraso de Fala e Linguagem","Gagueira Infantil","Gagueira Adulta","Afasia","Voz","Motricidade Orofacial","Deglutição / Disfagia","Fluência","TEA","Neuropediatria","Parkinson","Alzheimer / Demências","Outro"];
+const todayISO=new Date().toISOString().split("T")[0];
+const todayBR=new Date().toLocaleDateString("pt-BR");
+const fmt=d=>d?new Date(d+"T12:00:00").toLocaleDateString("pt-BR"):"—";
+
+const PROTOS={
+
+"Linguagem Infantil":{title:"Avaliação de Linguagem Infantil",fields:[["eval_compreensao","Compreensão verbal",3],["eval_expressao","Expressão verbal",3],["eval_nao_verbal","Comunicação não verbal (gestos, apontar, contato visual)",3],["eval_vocab","Vocabulário receptivo e expressivo",2],["eval_pragmatica","Pragmática / Intenção comunicativa",2],["eval_fonologia","Fonologia / Consciência fonológica",2],["eval_brincar","Jogo simbólico / Brincadeira",2]]},
+  "Atraso de Fala e Linguagem":{title:"Avaliação — Atraso de Fala e Linguagem",fields:[["eval_compreensao","Compreensão verbal",3],["eval_expressao","Expressão verbal",3],["eval_fonologia","Fonologia / Processos fonológicos",3],["eval_vocab","Vocabulário",2],["eval_inteligibilidade","Inteligibilidade de fala",2],["eval_pragmatica","Pragmática",2],["eval_oral_motor","Aspectos oromotores",2]]},
+  "Gagueira Infantil":{title:"Avaliação de Gagueira Infantil",fields:[["eval_tipo_disfluencia","Tipo e frequência de disfluências",3],["eval_comportamentos","Comportamentos secundários",3],["eval_impacto","Impacto na comunicação",2],["eval_reacao_crianca","Reação da criança à própria fala",2],["eval_reacao_familia","Reação da família / ambiente",2],["eval_situacoes","Situações de maior/menor ocorrência",2]]},
+  "Gagueira Adulta":{title:"Avaliação de Gagueira — Adulto",fields:[["eval_tipo_disfluencia","Tipo e frequência de disfluências",3],["eval_comportamentos","Comportamentos secundários e evitações",3],["eval_impacto","Impacto na vida profissional e social",3],["eval_ansiedade","Ansiedade comunicativa / Autoconceito",2],["eval_situacoes","Situações de maior e menor disfluência",2],["eval_historico","Histórico e tratamentos anteriores",2]]},
+  "Afasia":{title:"Avaliação de Afasia",fields:[["eval_tipo_afasia","Tipo de afasia",2],["eval_compreensao","Compreensão auditiva",3],["eval_expressao","Expressão oral",3],["eval_nomeacao","Nomeação / Evocação lexical",3],["eval_repeticao","Repetição",2],["eval_leitura","Leitura / Alexia",2],["eval_escrita","Escrita / Agrafia",2],["eval_pragmatica","Comunicação funcional",2]]},
+  "Voz":{title:"Avaliação de Voz",fields:[["eval_qualidade_vocal","Qualidade vocal (rouquidão, soprosidade, tensão)",3],["eval_pitch","Frequência fundamental / Pitch habitual",2],["eval_loudness","Loudness / Projeção vocal",2],["eval_ressonancia","Ressonância",2],["eval_respiracao","Coordenação pneumofonoarticulatória",3],["eval_higiene_vocal","Higiene vocal / Hábitos vocais",2],["eval_uso_profissional","Uso profissional da voz",2],["eval_laringoscopia","Laringoscopia / Exames complementares",2]]},
+  "Motricidade Orofacial":{title:"Avaliação de Motricidade Orofacial",fields:[["eval_tonus","Tônus muscular (lábios, bochechas, língua, mandíbula)",3],["eval_mobilidade","Mobilidade de estruturas orofaciais",3],["eval_mastigacao","Mastigação (tipo, eficiência, lateralização)",3],["eval_degluticao","Deglutição de saliva / padrão deglutitório",3],["eval_respiracao","Modo respiratório (nasal/oral/misto)",2],["eval_postura","Postura de lábios e língua em repouso",2],["eval_habitos","Hábitos orais deletérios",2]]},
+  "Deglutição / Disfagia":{title:"Avaliação de Deglutição / Disfagia",fields:[["eval_anamnese_deg","Histórico alimentar e queixas",3],["eval_oral_deg","Fase oral (preparo e ejeção do bolo)",3],["eval_faringea","Fase faríngea / sinais clínicos de aspiração",3],["eval_consistencias","Consistências testadas e respostas",3],["eval_sinais_aspiracao","Sinais de aspiração / Penetração laríngea",2],["eval_postura_deg","Posturas e manobras compensatórias",2],["eval_via_alimentar","Via de alimentação atual (VO/SNE/GTT)",2],["eval_exames_deg","Exames complementares (VED, VFSS)",2]]},
+✦✦✦✦✦✦✦✦✦✦✦
+
+"TEA":{title:"Avaliação Fonoaudiológica — TEA",fields:[["eval_comunicacao_tea","Perfil comunicativo (verbal/não verbal/minimamente verbal)",3],["eval_intencao","Intenção e iniciativa comunicativa",3],["eval_linguagem_tea","Compreensão e expressão de linguagem",3],["eval_ecolalia","Ecolalia (imediata/tardia/funcional)",2],["eval_pragmatica","Pragmática / Função social da comunicação",3],["eval_caa","Uso de CAA",2],["eval_brincar","Jogo simbólico e interação",2],["eval_sensorial","Perfil sensorial relacionado à comunicação",2]]},
+  "Parkinson":{title:"Avaliação Fonoaudiológica — Parkinson",fields:[["eval_voz_park","Voz (hipofonia, monopitch, qualidade vocal)",3],["eval_articulacao","Articulação / Disartria hipocinética",3],["eval_velocidade","Velocidade de fala / Festinação verbal",2],["eval_deglut_park","Deglutição (fases oral e faríngea)",3],["eval_saliva","Manejo de saliva / Sialorreia",2],["eval_cognicao_park","Aspectos cognitivo-comunicativos",2],["eval_estadio","Estádio da doença (Hoehn e Yahr)",2],["eval_lsvt","Indicação para LSVT LOUD",2]]},
+  "Alzheimer / Demências":{title:"Avaliação Fonoaudiológica — Alzheimer / Demências",fields:[["eval_estadio_alz","Estádio da demência (leve/moderado/grave)",2],["eval_compreensao","Compreensão verbal e não verbal",3],["eval_expressao","Expressão oral / Conteúdo informacional",3],["eval_memoria_ling","Memória de trabalho e linguagem",3],["eval_nomeacao","Nomeação / Anomia",2],["eval_discurso","Coerência e coesão do discurso",2],["eval_deglut_alz","Deglutição / Risco de aspiração",3],["eval_funcional","Comunicação funcional no cotidiano",2]]},
+};
+
+function App(){
+  const [sess,setSess]=useState(null);
+  const [loading,setLoading]=useState(false);
+  const [syncing,setSyncing]=useState(false);
+  const [sec,setSec]=useState("dashboard");
+  const [eIn,setEIn]=useState(""); const [pIn,setPIn]=useState(""); const [err,setErr]=useState("");
+  const [patients,setPatients]=useState([]); const [appts,setAppts]=useState([]);
+  const [selPt,setSelPt]=useState(null); const [ptEdit,setPtEdit]=useState({});
+  const [tab,setTab]=useState("identificacao"); const [search,setSearch]=useState("");
+  const [showNP,setShowNP]=useState(false); const [showNA,setShowNA]=useState(false); const [showNotif,setShowNotif]=useState(false);
+  const [newPt,setNewPt]=useState({name:"",dob:"",guardian:"",phone:"",cpf:"",address:"",diagnosis:"",specialty:""});
+  const [newA,setNewA]=useState({date:todayISO,time:"",patient:"",specialty:"",status:"Pendente"});
+  const [evo,setEvo]=useState({date:todayISO,objective:"",conduct:"",response:""});
+  const [aiMsgs,setAiMsgs]=useState([{role:"assistant",content:"Olá! Sou a Assistente IA do NQ Fono 🌸\n\nPosso ajudar com evoluções clínicas, relatórios, devolutivas familiares e objetivos terapêuticos.\n\nComo posso ajudar hoje?"}]);
+  const [aiIn,setAiIn]=useState(""); const [aiLoad,setAiLoad]=useState(false);
+  const aiRef=useRef(null);
+
+  useEffect(()=>{try{const s=sessionStorage.getItem(SESSION_KEY);if(s){const p=JSON.parse(s);setSess(p);fetchAll();}}catch{}}, []);
+  useEffect(()=>{if(aiRef.current)aiRef.current.scrollTop=aiRef.current.scrollHeight;},[aiMsgs,aiLoad]);
+  useEffect(()=>{if(selPt)setPtEdit({...selPt});},[selPt]);
+
+  async function fetchAll(){
+    setLoading(true);
+    try{
+      const [pts,evos,apts]=await Promise.all([dbGet("patients"),dbGet("evolutions"),dbGet("appointments")]);
+      setPatients((pts||[]).map(p=>({...p,evolutions:(evos||[]).filter(e=>e.patient_id===p.id)})));
+      setAppts(apts||[]);
+    }catch(e){console.error(e);}
+    setLoading(false);
+  }
+
+  function login(e){
+    e.preventDefault(); setLoading(true); setErr("");
+    if(eIn.trim().toLowerCase()!==CREDS.email||pIn!==CREDS.password){setErr("E-mail ou senha incorretos.");setLoading(false);return;}
+    const s={user:{email:CREDS.email}};
+    sessionStorage.setItem(SESSION_KEY,JSON.stringify(s));
+    setSess(s); fetchAll(); setLoading(false);
+  }
+  function logout(){sessionStorage.removeItem(SESSION_KEY);setSess(null);setPatients([]);setAppts([]);}
+
+  async function saveNewPt(){
+✦✦✦✦✦✦✦✦✦✦✦
+
+if(!newPt.name.trim())return; setSyncing(true);
+    const row={...newPt,id:Date.now(),created_at:new Date().toISOString()};
+    await dbIns("patients",row);
+    setPatients(p=>[{...row,evolutions:[]}, ...p]);
+    setNewPt({name:"",dob:"",guardian:"",phone:"",cpf:"",address:"",diagnosis:"",specialty:""});
+    setShowNP(false); setSyncing(false);
+  }
+  async function savePtEdits(){
+    if(!ptEdit.id)return; setSyncing(true);
+    const {evolutions,...fields}=ptEdit;
+    await dbUpd("patients",ptEdit.id,fields);
+    setPatients(p=>p.map(x=>x.id===ptEdit.id?{...x,...fields}:x));
+    setSelPt(p=>({...p,...fields})); setSyncing(false);
+  }
+  async function delPt(id){
+    if(!confirm("Excluir este paciente?"))return;
+    await dbDel("patients",id);
+    setPatients(p=>p.filter(x=>x.id!==id)); setSelPt(null); setSec("pacientes");
+  }
+  async function saveAppt(){
+    if(!newA.time||!newA.patient)return; setSyncing(true);
+    const row={...newA,id:Date.now(),created_at:new Date().toISOString()};
+    await dbIns("appointments",row); setAppts(a=>[row,...a]);
+    setNewA({date:todayISO,time:"",patient:"",specialty:"",status:"Pendente"});
+    setShowNA(false); setSyncing(false);
+  }
+  async function updAppt(id,status){await dbUpd("appointments",id,{status});setAppts(a=>a.map(x=>x.id===id?{...x,status}:x));}
+  async function delAppt(id){await dbDel("appointments",id);setAppts(a=>a.filter(x=>x.id!==id));}
+  async function saveEvo(){
+    if(!selPt||!evo.conduct.trim())return; setSyncing(true);
+    const row={...evo,id:Date.now(),patient_id:selPt.id,created_at:new Date().toISOString()};
+    await dbIns("evolutions",row);
+    const upd={...selPt,evolutions:[row,...(selPt.evolutions||[])]};
+    setSelPt(upd); setPatients(p=>p.map(x=>x.id===selPt.id?upd:x));
+    setEvo({date:todayISO,objective:"",conduct:"",response:""}); setSyncing(false);
+  }
+  async function delEvo(id){
+    await dbDel("evolutions",id);
+    const upd={...selPt,evolutions:(selPt.evolutions||[]).filter(e=>e.id!==id)};
+    setSelPt(upd); setPatients(p=>p.map(x=>x.id===selPt.id?upd:x));
+  }
+  async function sendAI(custom){
+    const content=custom||aiIn.trim(); if(!content||aiLoad)return;
+    const msgs=[...aiMsgs,{role:"user",content}];
+    setAiMsgs(msgs); setAiIn(""); setAiLoad(true);
+    const resp=await callAI(msgs.map(m=>({role:m.role,content:m.content})));
+    setAiMsgs([...msgs,{role:"assistant",content:resp}]); setAiLoad(false);
+  }
+  function quickAI(p){const ctx=selPt?`Paciente: ${selPt.name} (${selPt.specialty||"fonoaudiologia"}). `:"";sendAI(ctx+p);setSec("ia");}
+
+  const todayApts=appts.filter(a=>a.date===todayISO);
+  const filtered=patients.filter(p=>p.name?.toLowerCase().includes(search.toLowerCase()));
+  const totalEvos=patients.reduce((n,p)=>n+(p.evolutions?.length||0),0);
+  const stCls=s=>s==="Confirmado"?"sc":s==="Atendido"?"sa":s==="Cancelado"?"sx":"sp";
+
+  const F=({k,l,rows})=>(
+    <div>
+      <label>{l}</label>
+      {rows?<textarea className="inp" rows={rows} value={ptEdit[k]||""} onChange={e=>setPtEdit({...ptEdit,[k]:e.target.value})}/>
+           :<input className="inp" value={ptEdit[k]||""} onChange={e=>setPtEdit({...ptEdit,[k]:e.target.value})}/>}
+    </div>
+  );
+
+  if(!sess) return (
+    <div className="login-bg">
+      <div className="login-card fade-up">
+        <div className="login-logo">
+          <h1>NQ Fono</h1>
+          <p className="sub">Sistema Clínico Fonoaudiológico</p>
+          <div className="ornament"><span>✦</span></div>
+          <p className="prof">Nayara Querino, Fonoaudióloga<br/>CRFa 8-11873</p>
+        </div>
+        <form onSubmit={login} style={{marginTop:28}}>
+          <div className="field"><span className="field-ico">✉</span><input type="email" placeholder="E-mail" value={eIn} onChange={e=>setEIn(e.target.value)} required/></div>
+          <div className="field"><span className="field-ico">🔒</span><input type="password" placeholder="Senha" value={pIn} onChange={e=>setPIn(e.target.value)} required/></div>
+✦✦✦✦✦✦✦✦✦✦✦
+
+<button type="submit" className="btn-login" disabled={loading}>{loading?<><span className="sp2"/>Entrando...</>:"Entrar no NQ Fono"}</button>
+        </form>
+        {err&&<div className="err">⚠ {err}</div>}
+        <div className="sec"><div className="sec-dot"/>Acesso protegido · Dados na nuvem · LGPD-friendly</div>
+      </div>
+    </div>
+  );
+
+  if(loading) return (
+    <div className="load">
+      <h2>NQ Fono</h2><p>Carregando dados da nuvem...</p><div className="ring"/>
+    </div>
+  );
+
+  const navs=[["dashboard","🏠","Dashboard"],["pacientes","👥","Pacientes"],["prontuario","📋","Prontuário"],["agenda","📅","Agenda"],["relatorios","📄","Relatórios"],["ia","✨","Assistente IA"],["config","⚙️","Configurações"]];
+  const titles={dashboard:"Visão geral",pacientes:"Pacientes",prontuario:selPt?selPt.name:"Prontuário",agenda:"Agenda",relatorios:"Relatórios",ia:"Assistente IA",config:"Configurações"};
+
+  return (
+    <div className="app">
+      <aside className="sidebar">
+        <div className="sb-brand"><h2>NQ Fono</h2><p>Sistema Clínico</p></div>
+        {navs.map(([k,ico,l])=>(
+          <button key={k} className={`nav ${sec===k?"on":""}`} onClick={()=>setSec(k)}>
+            <span style={{width:20,textAlign:"center"}}>{ico}</span>{l}
+          </button>
+        ))}
+        <div className="sb-foot">
+          <div className="sync"><div className="sec-dot"/>Nuvem sincronizada</div>
+          <div className="sb-prof"><strong>Nayara Querino</strong><span>Fonoaudióloga · CRFa 8-11873</span></div>
+          <button className="nav" style={{marginTop:8,color:"var(--rose)"}} onClick={logout}>🚪 Sair</button>
+        </div>
+      </aside>
+
+      <main className="main">
+        <div className="topbar">
+          <div>
+            <div className="page-title">{titles[sec]}</div>
+            <div className="page-sub">NQ Fono · Nayara Querino · CRFa 8-11873{syncing?" · ☁ Sincronizando...":""}</div>
+          </div>
+          <div style={{position:"relative"}}>
+            <button className="nb" onClick={()=>setShowNotif(v=>!v)}>🔔<span className="nbg">1</span></button>
+            {showNotif&&<div className="np"><div className="nh">Notificações</div><div className="ni ur">Sistema conectado<div className="nt">Agora</div></div><div className="ni">Backup ativo<div className="nt">Hoje</div></div></div>}
+          </div>
+        </div>
+
+        {sec==="dashboard"&&<div className="fade-up">
+          <div className="g5">
+            {[{i:"👥",l:"Pacientes",v:patients.length},{i:"📅",l:"Hoje",v:todayApts.length},{i:"📝",l:"Evoluções",v:totalEvos},{i:"⏳",l:"Pendentes",v:todayApts.filter(a=>a.status==="Pendente").length},{i:"✅",l:"Atendidos",v:todayApts.filter(a=>a.status==="Atendido").length}].map((s,i)=>(
+              <div key={i} className="stat"><div className="stat-ico">{s.i}</div><div className="stat-val">{s.v}</div><div className="stat-lbl">{s.l}</div></div>
+            ))}
+          </div>
+          <div className="g3">
+            <div className="card">
+              <div className="card-title">Agenda — {todayBR}</div>
+              {todayApts.length===0?<p style={{color:"var(--stone)",fontSize:".84rem"}}>Nenhum atendimento.</p>:todayApts.map(a=>(
+                <div key={a.id} className="ar"><span className="at">{a.time}</span><div style={{flex:1}}><strong style={{fontSize:".85rem"}}>{a.patient}</strong><div style={{fontSize:".72rem",color:"var(--stone)"}}>{a.specialty}</div></div><span className={`ss ${stCls(a.status)}`}>{a.status}</span></div>
+              ))}
+            </div>
+            <div className="card">
+              <div className="card-title">Pacientes recentes</div>
+              {patients.slice(0,5).map(p=>(
+                <div key={p.id} className="li" onClick={()=>{setSelPt(p);setSec("prontuario");setTab("identificacao")}}>
+                  <div><strong>👤 {p.name}</strong><span>{p.specialty||"—"}</span></div>
+                  <span className="tag">{p.evolutions?.length||0} evol.</span>
+                </div>
+              ))}
+              {patients.
+
+length===0&&<p style={{color:"var(--stone)",fontSize:".84rem"}}>Nenhum paciente ainda.</p>}
+            </div>
+            <div className="card">
+              <div className="card-title">Acesso rápido</div>
+              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
+                {[["➕ Novo paciente",()=>setShowNP(true)],["📅 Nova consulta",()=>setShowNA(true)],["✨ Assistente IA",()=>setSec("ia")],["📋 Prontuários",()=>setSec("pacientes")],["📄 Relatórios",()=>setSec("relatorios")],["📆 Agenda",()=>setSec("agenda")]].map(([l,fn],i)=>(
+                  <button key={i} className="btn bo" style={{padding:"10px 7px",textAlign:"center",fontSize:".77rem"}} onClick={fn}>{l}</button>
+                ))}
+              </div>
+              <div className="dvd"/>
+              <div className="sync" style={{justifyContent:"center"}}><div className="sec-dot"/>Dados sincronizados na nuvem</div>
+            </div>
+          </div>
+        </div>}
+
+        {sec==="pacientes"&&<div className="fade-up">
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16}}>
+            <span style={{fontFamily:"Playfair Display,serif",fontSize:"1rem",color:"var(--bark)"}}>{patients.length} paciente{patients.length!==1?"s":""}</span>
+            <button className="btn br" onClick={()=>setShowNP(true)}>+ Novo paciente</button>
+          </div>
+          <div style={{position:"relative",marginBottom:13}}>
+            <span style={{position:"absolute",left:12,top:"50%",transform:"translateY(-50%)",color:"var(--mist)"}}>🔍</span>
+            <input className="inp" style={{paddingLeft:34}} placeholder="Buscar..." value={search} onChange={e=>setSearch(e.target.value)}/>
+          </div>
+          {filtered.map(p=>(
+            <div key={p.id} className={`pc ${selPt?.id===p.id?"sel":""}`} onClick={()=>{setSelPt(p);setSec("prontuario");setTab("identificacao")}}>
+              <div><strong style={{color:"var(--bark)"}}>👤 {p.name}</strong><div style={{fontSize:".73rem",color:"var(--stone)",marginTop:2}}>{p.specialty||"Área não informada"} · {fmt(p.created_at)}</div></div>
+              <div style={{display:"flex",gap:7,alignItems:"center"}}>
+                <span className="tag">{p.evolutions?.length||0} evol.</span>
+                <button className="btn bsm bo" onClick={e=>{e.stopPropagation();setSelPt(p);setSec("prontuario");setTab("identificacao")}}>Abrir</button>
+              </div>
+            </div>
+          ))}
+          {filtered.length===0&&<p style={{color:"var(--stone)",fontSize:".84rem"}}>Nenhum paciente encontrado.</p>}
+        </div>}
+
+        {sec==="prontuario"&&(!selPt?<div className="card fade-up" style={{textAlign:"center",padding:44}}><p style={{color:"var(--stone)"}}>Selecione um paciente.</p><button className="btn br" style={{marginTop:16}} onClick={()=>setSec("pacientes")}>Ver pacientes</button></div>:
+          <div className="fade-up">
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16}}>
+              <div><div style={{fontFamily:"Playfair Display,serif",fontSize:"1.7rem",fontWeight:300,color:"var(--bark)"}}>{selPt.name}</div><div style={{fontSize:".7rem",color:"var(--dusty)",letterSpacing:".15em",textTransform:"uppercase"}}>{selPt.specialty||"Área não informada"}</div></div>
+              <div style={{display:"flex",gap:8}}>
+                <button className="btn bsm bo" onClick={()=>setSec("pacientes")}>← Voltar</button>
+                <button className="btn bsm br" onClick={savePtEdits} disabled={syncing}>{syncing?"Salvando...":"💾 Salvar"}</button>
+                <button className="btn bsm bd" onClick={()=>delPt(selPt.id)}>🗑</button>
+              </div>
+            </div>
+            <div className="tabs">
+              {[["identificacao","Identificação"],["anamnese","Anamnese"],["avaliacao","Avaliação"],["evolucao","Evolução"],["documentos","Documentos"]].map(([k,l])=>(
+                <button key={k} className={`tab ${tab===k?"on":""}`} onClick={()=>setTab(k)}>{l}</button>
+              ))}
+
+</div>
+            <div className="card">
+              {tab==="identificacao"&&<div className="fs"><h4>Dados do Paciente</h4>
+                <div className="g2" style={{gap:13}}>
+                  {[["name","Nome completo"],["guardian","Responsável"],["phone","Telefone"],["cpf","CPF (opcional)"]].map(([k,l])=><F key={k} k={k} l={l}/>)}
+                  <div><label>Data de nascimento</label><input className="inp" type="date" value={ptEdit.dob||""} onChange={e=>setPtEdit({...ptEdit,dob:e.target.value})}/></div>
+                  <div><label>Área de atuação</label><select className="inp" value={ptEdit.specialty||""} onChange={e=>setPtEdit({...ptEdit,specialty:e.target.value})}><option value="">Selecione...</option>{AREAS.map(a=><option key={a}>{a}</option>)}</select></div>
+                </div>
+                <div style={{marginTop:12}}><F k="address" l="Endereço"/></div>
+                <div style={{marginTop:12}}><F k="diagnosis" l="Hipótese diagnóstica / Encaminhamento"/></div>
+              </div>}
+
+              {tab==="anamnese"&&<div className="fs"><h4>Anamnese Clínica</h4>
+                <div style={{display:"flex",flexDirection:"column",gap:12}}>
+                  {[["complaint","Queixa principal",2],["dev_history","Histórico de desenvolvimento",3],["feeding","Alimentação / deglutição / comportamento alimentar",3],["sleep","Sono e comportamento geral",2],["prenatal","Histórico pré e perinatal",2],["med_history","Histórico médico e condições associadas",3],["medications","Medicações em uso",2],["schooling","Escolarização e contexto social",2],["family_history","Histórico familiar relevante",2]].map(([k,l,r])=><F key={k} k={k} l={l} rows={r}/>)}
+                </div>
+              </div>}
+
+              {tab==="avaliacao"&&(()=>{
+                const proto=PROTOS[selPt.specialty]||{title:"Avaliação Fonoaudiológica Geral",fields:[["eval_language","Linguagem",3],["eval_speech","Fala",3],["eval_voice","Voz",3],["eval_mof","Motricidade Orofacial",3],["eval_swallow","Deglutição",3],["eval_fluency","Fluência",3]]};
+                return <div>
+                  <div className="fs"><h4>{proto.title}</h4>
+                    {PROTOS[selPt.specialty]&&<div className="proto-badge">✨ Protocolo específico para <strong>{selPt.specialty}</strong> carregado automaticamente</div>}
+                    <div style={{display:"flex",flexDirection:"column",gap:12}}>{proto.fields.map(([k,l,r])=><F key={k} k={k} l={l} rows={r||3}/>)}</div>
+                  </div>
+                  <div className="fs"><h4>Síntese Diagnóstica</h4>
+                    <div style={{display:"flex",flexDirection:"column",gap:12}}>
+                      <F k="eval_instruments" l="Instrumentos e testes utilizados" rows={2}/>
+                      <F k="eval_notes" l="Observações clínicas gerais" rows={2}/>
+                      <F k="eval_diagnosis" l="Hipótese diagnóstica fonoaudiológica" rows={2}/>
+                      <F k="therapy_plan" l="Plano terapêutico" rows={3}/>
+                      <F k="eval_prognosis" l="Prognóstico e metas" rows={2}/>
+                    </div>
+                  </div>
+                  <div style={{display:"flex",gap:9,flexWrap:"wrap"}}>
+                    <button className="btn br" onClick={savePtEdits} disabled={syncing}>{syncing?"Salvando...":"💾 Salvar"}</button>
+                    <button className="btn bo" onClick={()=>quickAI(`Elabore plano terapêutico para ${selPt.name} (${selPt.specialty||""}). Hipótese: "${ptEdit.eval_diagnosis||"a confirmar"}".`)}>✨ Gerar plano com IA</button>
+                    <button className="btn bo" onClick={()=>quickAI(`Redija relatório de avaliação fonoaudiológica para ${selPt.name} (${selPt.specialty||""}). Hipótese: "${ptEdit.eval_diagnosis||"em avaliação"}". Plano: "${ptEdit.therapy_plan||"em elaboração"}".`)}>📄 Gerar relatório</button>
+                  </div>
+                </div>;
+              })()}
+
+              {tab==="evolucao"&&<div>
+                <div className="fs"><h4>Nova Evolução</h4>
+✦✦✦✦✦✦✦✦✦✦✦
+
+<div style={{display:"flex",flexDirection:"column",gap:12}}>
+                    <div><label>Data</label><input className="inp" type="date" value={evo.date} onChange={e=>setEvo({...evo,date:e.target.value})}/></div>
+                    <div><label>Objetivo terapêutico</label><textarea className="inp" rows={2} value={evo.objective} onChange={e=>setEvo({...evo,objective:e.target.value})}/></div>
+                    <div><label>Conduta realizada</label><textarea className="inp" rows={3} value={evo.conduct} onChange={e=>setEvo({...evo,conduct:e.target.value})}/></div>
+                    <div><label>Resposta clínica / Orientações</label><textarea className="inp" rows={3} value={evo.response} onChange={e=>setEvo({...evo,response:e.target.value})}/></div>
+                  </div>
+                  <div style={{display:"flex",gap:9,marginTop:14}}>
+                    <button className="btn br" onClick={saveEvo} disabled={syncing}>{syncing?"Salvando...":"💾 Salvar"}</button>
+                    <button className="btn bo" onClick={()=>quickAI(`Escreva evolução clínica fonoaudiológica para ${selPt.name} (${selPt.specialty||""}). Conduta: "${evo.conduct||"estimulação terapêutica"}". Objetivo: "${evo.objective||"não informado"}".`)}>✨ Gerar com IA</button>
+                  </div>
+                </div>
+                <div className="dvd"/>
+                <div className="fs"><h4>Histórico ({selPt.evolutions?.length||0})</h4>
+                  {(selPt.evolutions||[]).length===0&&<p style={{color:"var(--stone)",fontSize:".84rem"}}>Nenhuma evolução ainda.</p>}
+                  {(selPt.evolutions||[]).map(e=>(
+                    <div key={e.id} style={{background:"var(--ivory)",borderRadius:"var(--rs)",padding:14,marginBottom:10}}>
+                      <div style={{display:"flex",justifyContent:"space-between",marginBottom:5}}>
+                        <span style={{fontSize:".71rem",color:"var(--dusty)",fontWeight:600}}>📅 {fmt(e.date)}</span>
+                        <button className="btn bsm bd" style={{padding:"2px 8px",fontSize:".68rem"}} onClick={()=>delEvo(e.id)}>🗑</button>
+                      </div>
+                      {e.objective&&<p style={{fontSize:".82rem",marginBottom:3}}><strong>Objetivo:</strong> {e.objective}</p>}
+                      <p style={{fontSize:".82rem",marginBottom:3}}><strong>Conduta:</strong> {e.conduct}</p>
+                      {e.response&&<p style={{fontSize:".82rem"}}><strong>Resposta:</strong> {e.response}</p>}
+                    </div>
+                  ))}
+                </div>
+              </div>}
+
+              {tab==="documentos"&&<div className="fs"><h4>Relatório Clínico</h4>
+                <div className="rp">
+                  <div className="rh"><h2>NQ Fono</h2><p style={{fontSize:".77rem",color:"var(--stone)",fontStyle:"italic"}}>Nayara Querino · Fonoaudióloga · CRFa 8-11873 · {todayBR}</p></div>
+                  <div className="rs"><h4>Paciente</h4><p>{selPt.name}</p></div>
+                  {selPt.specialty&&<div className="rs"><h4>Área Terapêutica</h4><p>{selPt.specialty}</p></div>}
+                  {selPt.diagnosis&&<div className="rs"><h4>Hipótese Diagnóstica</h4><p>{selPt.diagnosis}</p></div>}
+                  {selPt.eval_diagnosis&&<div className="rs"><h4>Diagnóstico Fonoaudiológico</h4><p>{selPt.eval_diagnosis}</p></div>}
+                  {selPt.therapy_plan&&<div className="rs"><h4>Plano Terapêutico</h4><p>{selPt.therapy_plan}</p></div>}
+                  {(selPt.evolutions||[]).length>0&&<div className="rs"><h4>Evolução Recente</h4><p><strong>{fmt(selPt.evolutions[0].date)}:</strong> {selPt.evolutions[0].conduct}</p></div>}
+                  <div style={{borderTop:"1px solid var(--mist)",paddingTop:16,marginTop:20}}><p style={{fontSize:".76rem",color:"var(--stone)"}}>Nayara Querino · Fonoaudióloga · CRFa 8-11873<br/>Documento confidencial. LGPD.</p></div>
+                </div>
+                <div style={{marginTop:13,display:"flex",gap:9,flexWrap:"wrap"}}>
+
+<button className="btn bo" onClick={()=>quickAI(`Redija relatório clínico fonoaudiológico para ${selPt.name} (${selPt.specialty||""}). Diagnóstico: ${selPt.eval_diagnosis||selPt.diagnosis||"a confirmar"}. Plano: ${selPt.therapy_plan||"em elaboração"}. Evolução: ${selPt.evolutions?.[0]?.conduct||"em acompanhamento"}.`)}>✨ Gerar com IA</button>
+                  <button className="btn bo" onClick={()=>window.print()}>🖨 Imprimir</button>
+                </div>
+              </div>}
+            </div>
+          </div>
+        )}
+
+        {sec==="agenda"&&<div className="fade-up">
+          <div style={{display:"flex",justifyContent:"flex-end",marginBottom:16}}>
+            <button className="btn br" onClick={()=>setShowNA(true)}>+ Nova consulta</button>
+          </div>
+          <div className="card"><div className="card-title">Agendamentos</div>
+            {appts.length===0&&<p style={{color:"var(--stone)",fontSize:".84rem"}}>Nenhuma consulta.</p>}
+            {appts.map(a=>(
+              <div key={a.id} className="ar">
+                <span className="at">{a.time}</span>
+                <div style={{flex:1}}><strong style={{fontSize:".85rem"}}>{a.patient}</strong><div style={{fontSize:".71rem",color:"var(--stone)"}}>{a.specialty} · {fmt(a.date)}</div></div>
+                <div style={{display:"flex",gap:7,alignItems:"center"}}>
+                  <span className={`ss ${stCls(a.status)}`}>{a.status}</span>
+                  <select className="inp" style={{width:"auto",padding:"4px 8px",fontSize:".72rem"}} value={a.status} onChange={e=>updAppt(a.id,e.target.value)}>
+                    {["Pendente","Confirmado","Atendido","Cancelado"].map(s=><option key={s}>{s}</option>)}
+                  </select>
+                  <button className="btn bsm bd" style={{padding:"4px 8px"}} onClick={()=>delAppt(a.id)}>🗑</button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>}
+
+        {sec==="ia"&&<div className="fade-up">
+          <div className="card" style={{marginBottom:16}}>
+            <div className="card-title">✨ Assistente IA Fonoaudiológico</div>
+            <p style={{fontSize:".83rem",color:"var(--stone)",marginBottom:16}}>Uso ilimitado · Especializada em fonoaudiologia · Textos para revisão da Fonoaudióloga.</p>
+            <div className="qp">
+              {[["📝 Evolução clínica","Escreva modelo de evolução clínica fonoaudiológica para sessão terapêutica infantil com foco em linguagem expressiva e atenção conjunta."],["📄 Relatório profissional","Redija relatório fonoaudiológico completo para encaminhamento multiprofissional."],["👨‍👩‍👧 Devolutiva familiar","Redija devolutiva para responsáveis de paciente com atraso de linguagem, de forma clara e acolhedora."],["🎯 Objetivos terapêuticos","Liste 6 objetivos terapêuticos fonoaudiológicos para disfagia neurogênica leve a moderada."],["🔬 Relatório de avaliação","Redija relatório completo de avaliação fonoaudiológica de linguagem e fala para criança em idade escolar."],["📋 Plano terapêutico","Elabore plano terapêutico fonoaudiológico para paciente adulto com gagueira."]].map(([l,p],i)=>(
+                <button key={i} className="qb" onClick={()=>sendAI(p)}>{l}</button>
+              ))}
+            </div>
+          </div>
+          <div className="card">
+            <div ref={aiRef} className="chat-msgs">
+              {aiMsgs.map((m,i)=>(
+                <div key={i} className={`msg ${m.role==="user"?"mu":"ma"}`}>
+                  {m.role==="assistant"&&<span className="ai-lbl">✨ Assistente IA NQ Fono</span>}
+                  {m.content.split("\n").map((l,j)=><span key={j}>{l}<br/></span>)}
+                </div>
+              ))}
+              {aiLoad&&<div className="msg ma"><span className="ai-lbl">✨ Assistente IA NQ Fono</span><div className="ty"><span/><span/><span/></div></div>}
+            </div>
+            <div style={{display:"flex",gap:8}}>
+              <textarea className="inp" style={{flex:1,minHeight:44,maxHeight:110,resize:"vertical"}} placeholder="Descreva o que precisa...
+✦✦✦✦✦✦✦✦✦✦✦
+
+" value={aiIn} onChange={e=>setAiIn(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();sendAI();}}}/>
+              <button className="btn br" style={{alignSelf:"flex-end",padding:"11px 17px"}} onClick={()=>sendAI()} disabled={aiLoad}>{aiLoad?<><span className="sp2"/>...</>:"Enviar"}</button>
+            </div>
+            <p style={{fontSize:".7rem",color:"var(--mist)",marginTop:6}}>⚠ Textos gerados pela IA devem ser revisados antes do uso clínico.</p>
+          </div>
+        </div>}
+
+        {sec==="relatorios"&&<div className="fade-up"><div className="card"><div className="card-title">Relatórios Clínicos</div>
+          {patients.length===0&&<p style={{color:"var(--stone)",fontSize:".84rem"}}>Nenhum paciente cadastrado.</p>}
+          {patients.map(p=>(
+            <div key={p.id} className="li">
+              <div><strong>📄 {p.name}</strong><span>{p.specialty||"—"} · {p.evolutions?.length||0} evoluções</span></div>
+              <div style={{display:"flex",gap:7}}>
+                <button className="btn bsm bo" onClick={()=>{setSelPt(p);setSec("prontuario");setTab("documentos")}}>Ver</button>
+                <button className="btn bsm bo" onClick={()=>quickAI(`Gere relatório fonoaudiológico para ${p.name} (${p.specialty||""}). Diagnóstico: ${p.eval_diagnosis||p.diagnosis||"em avaliação"}.`)}>✨ IA</button>
+              </div>
+            </div>
+          ))}
+        </div></div>}
+
+        {sec==="config"&&<div className="fade-up"><div className="card" style={{maxWidth:500}}>
+          <div className="card-title">Configurações</div>
+          <div className="fs"><h4>Profissional</h4>
+            <div style={{display:"flex",flexDirection:"column",gap:10}}>
+              {[["Nome","Nayara Querino"],["Registro","CRFa 8-11873"],["E-mail","nayaraqrino@gmail.com"],["Especialidade","Fonoaudiologia"]].map(([l,v])=>(
+                <div key={l}><label>{l}</label><input className="inp" defaultValue={v} readOnly style={{opacity:.8}}/></div>
+              ))}
+            </div>
+          </div>
+          <div className="dvd"/>
+          <div className="fs"><h4>Segurança</h4>
+            <div style={{background:"var(--ivory)",borderRadius:"var(--rs)",padding:15,fontSize:".82rem",lineHeight:2}}>
+              ☁️ Banco de dados Supabase na nuvem<br/>🔄 Sincronização em tempo real<br/>🛡 Compatível com LGPD<br/>🔒 Sessão segura
+            </div>
+          </div>
+          <div className="dvd"/>
+          <div style={{display:"flex",gap:9}}>
+            <button className="btn bo" onClick={fetchAll}>🔄 Sincronizar</button>
+            <button className="btn bd" onClick={logout}>🚪 Sair</button>
+          </div>
+        </div></div>}
+      </main>
+
+      {showNP&&<div className="ov" onClick={()=>setShowNP(false)}><div className="mo fade-up" onClick={e=>e.stopPropagation()}>
+        <h3>Novo Paciente</h3>
+        <div style={{display:"flex",flexDirection:"column",gap:11}}>
+          {[["name","Nome completo *"],["guardian","Responsável"],["phone","Telefone"],["cpf","CPF (opcional)"],["address","Endereço"],["diagnosis","Hipótese diagnóstica"]].map(([k,l])=>(
+            <div key={k}><label>{l}</label><input className="inp" value={newPt[k]||""} onChange={e=>setNewPt({...newPt,[k]:e.target.value})}/></div>
+          ))}
+          <div><label>Data de nascimento</label><input className="inp" type="date" value={newPt.dob||""} onChange={e=>setNewPt({...newPt,dob:e.target.value})}/></div>
+          <div><label>Área de atuação</label><select className="inp" value={newPt.specialty} onChange={e=>setNewPt({...newPt,specialty:e.target.value})}><option value="">Selecione...</option>{AREAS.map(a=><option key={a}>{a}</option>)}</select></div>
+        </div>
+        <div style={{display:"flex",gap:9,marginTop:20}}>
+          <button className="btn br" onClick={saveNewPt} disabled={syncing}>{syncing?"Salvando...":"Cadastrar"}</button>
+          <button className="btn bo" onClick={()=>setShowNP(false)}>Cancelar</button>
+        </div>
+      </div></div>}
+✦✦✦✦✦✦✦✦✦✦✦
+
+{showNA&&<div className="ov" onClick={()=>setShowNA(false)}><div className="mo fade-up" onClick={e=>e.stopPropagation()}>
+        <h3>Nova Consulta</h3>
+        <div style={{display:"flex",flexDirection:"column",gap:11}}>
+          <div><label>Data</label><input className="inp" type="date" value={newA.date} onChange={e=>setNewA({...newA,date:e.target.value})}/></div>
+          <div><label>Horário *</label><input className="inp" type="time" value={newA.time} onChange={e=>setNewA({...newA,time:e.target.value})}/></div>
+          <div><label>Paciente *</label><input className="inp" value={newA.patient} onChange={e=>setNewA({...newA,patient:e.target.value})} list="ptl"/><datalist id="ptl">{patients.map(p=><option key={p.id} value={p.name}/>)}</datalist></div>
+          <div><label>Especialidade</label><select className="inp" value={newA.specialty} onChange={e=>setNewA({...newA,specialty:e.target.value})}><option value="">Selecione...</option>{AREAS.map(a=><option key={a}>{a}</option>)}</select></div>
+          <div><label>Status</label><select className="inp" value={newA.status} onChange={e=>setNewA({...newA,status:e.target.value})}>{["Pendente","Confirmado","Atendido","Cancelado"].map(s=><option key={s}>{s}</option>)}</select></div>
+        </div>
+        <div style={{display:"flex",gap:9,marginTop:20}}>
+          <button className="btn br" onClick={saveAppt} disabled={syncing}>{syncing?"Salvando...":"Agendar"}</button>
+          <button className="btn bo" onClick={()=>setShowNA(false)}>Cancelar</button>
+        </div>
+      </div></div>}
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+</script>
+</body>
+</html>
+ENDHTML
+echo "Done! Size: $(wc -c < /mnt/user-data/outputs/index.html) bytes"
