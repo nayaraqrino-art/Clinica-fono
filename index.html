@@ -1,4 +1,3 @@
-cat > /mnt/user-data/outputs/index.html << 'ENDHTML'
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -46,10 +45,7 @@ body{font-family:'Jost',sans-serif;background:var(--ivory);color:var(--bark)}
 .app{display:grid;grid-template-columns:260px 1fr;min-height:100vh}
 @media(max-width:860px){.app{grid-template-columns:1fr}.sidebar{display:none}}
 .sidebar{background:#fff;border-right:1px solid rgba(196,128,111,.1);padding:26px 17px;display:flex;flex-direction:column;gap:4px;position:sticky;top:0;height:100vh;overflow-y:auto}
-.
-✦✦✦✦✦✦✦✦✦✦✦
-
-sb-brand{padding:0 6px 20px;border-bottom:1px solid var(--petal);margin-bottom:6px}
+.sb-brand{padding:0 6px 20px;border-bottom:1px solid var(--petal);margin-bottom:6px}
 .sb-brand h2{font-family:'Playfair Display',serif;font-size:1.7rem;font-weight:400;color:var(--bark)}
 .sb-brand p{font-size:.62rem;letter-spacing:.28em;text-transform:uppercase;color:var(--dusty);margin-top:2px}
 .nav{display:flex;align-items:center;gap:10px;padding:11px 13px;border-radius:var(--rs);cursor:pointer;font-size:.85rem;color:var(--stone);border:none;background:transparent;width:100%;text-align:left;transition:all .17s;font-family:'Jost',sans-serif}
@@ -95,9 +91,7 @@ sb-brand{padding:0 6px 20px;border-bottom:1px solid var(--petal);margin-bottom:6
 .inp::placeholder{color:var(--mist)}
 textarea.inp{resize:vertical;min-height:78px}
 select.inp{appearance:none;cursor:pointer}
-label{font-size:.
-
-72rem;color:var(--stone);display:block;margin-bottom:5px}
+label{font-size:.72rem;color:var(--stone);display:block;margin-bottom:5px}
 .tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px}
 .tab{padding:7px 15px;border-radius:20px;font-size:.79rem;font-weight:500;cursor:pointer;border:1.5px solid var(--mist);background:transparent;color:var(--stone);transition:all .17s;font-family:'Jost',sans-serif}
 .tab:hover{border-color:var(--dusty);color:var(--dusty)}
@@ -133,9 +127,7 @@ label{font-size:.
 .nt{font-size:.69rem;color:var(--stone);margin-top:2px}
 .rp{background:#fff;border:1px solid var(--mist);border-radius:var(--rs);padding:26px}
 .rh{border-bottom:2px solid var(--dusty);padding-bottom:13px;margin-bottom:18px}
-.rh h2{font-family:'Playfair Display',serif;font-size:1.
-
-8rem;font-weight:300;color:var(--bark)}
+.rh h2{font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:300;color:var(--bark)}
 .rs{margin-bottom:16px}
 .rs h4{font-size:.7rem;letter-spacing:.15em;text-transform:uppercase;color:var(--dusty);margin-bottom:5px}
 .rs p{font-size:.86rem;color:var(--bark);line-height:1.7}
@@ -175,8 +167,7 @@ const todayBR=new Date().toLocaleDateString("pt-BR");
 const fmt=d=>d?new Date(d+"T12:00:00").toLocaleDateString("pt-BR"):"—";
 
 const PROTOS={
-
-"Linguagem Infantil":{title:"Avaliação de Linguagem Infantil",fields:[["eval_compreensao","Compreensão verbal",3],["eval_expressao","Expressão verbal",3],["eval_nao_verbal","Comunicação não verbal (gestos, apontar, contato visual)",3],["eval_vocab","Vocabulário receptivo e expressivo",2],["eval_pragmatica","Pragmática / Intenção comunicativa",2],["eval_fonologia","Fonologia / Consciência fonológica",2],["eval_brincar","Jogo simbólico / Brincadeira",2]]},
+  "Linguagem Infantil":{title:"Avaliação de Linguagem Infantil",fields:[["eval_compreensao","Compreensão verbal",3],["eval_expressao","Expressão verbal",3],["eval_nao_verbal","Comunicação não verbal (gestos, apontar, contato visual)",3],["eval_vocab","Vocabulário receptivo e expressivo",2],["eval_pragmatica","Pragmática / Intenção comunicativa",2],["eval_fonologia","Fonologia / Consciência fonológica",2],["eval_brincar","Jogo simbólico / Brincadeira",2]]},
   "Atraso de Fala e Linguagem":{title:"Avaliação — Atraso de Fala e Linguagem",fields:[["eval_compreensao","Compreensão verbal",3],["eval_expressao","Expressão verbal",3],["eval_fonologia","Fonologia / Processos fonológicos",3],["eval_vocab","Vocabulário",2],["eval_inteligibilidade","Inteligibilidade de fala",2],["eval_pragmatica","Pragmática",2],["eval_oral_motor","Aspectos oromotores",2]]},
   "Gagueira Infantil":{title:"Avaliação de Gagueira Infantil",fields:[["eval_tipo_disfluencia","Tipo e frequência de disfluências",3],["eval_comportamentos","Comportamentos secundários",3],["eval_impacto","Impacto na comunicação",2],["eval_reacao_crianca","Reação da criança à própria fala",2],["eval_reacao_familia","Reação da família / ambiente",2],["eval_situacoes","Situações de maior/menor ocorrência",2]]},
   "Gagueira Adulta":{title:"Avaliação de Gagueira — Adulto",fields:[["eval_tipo_disfluencia","Tipo e frequência de disfluências",3],["eval_comportamentos","Comportamentos secundários e evitações",3],["eval_impacto","Impacto na vida profissional e social",3],["eval_ansiedade","Ansiedade comunicativa / Autoconceito",2],["eval_situacoes","Situações de maior e menor disfluência",2],["eval_historico","Histórico e tratamentos anteriores",2]]},
@@ -184,9 +175,7 @@ const PROTOS={
   "Voz":{title:"Avaliação de Voz",fields:[["eval_qualidade_vocal","Qualidade vocal (rouquidão, soprosidade, tensão)",3],["eval_pitch","Frequência fundamental / Pitch habitual",2],["eval_loudness","Loudness / Projeção vocal",2],["eval_ressonancia","Ressonância",2],["eval_respiracao","Coordenação pneumofonoarticulatória",3],["eval_higiene_vocal","Higiene vocal / Hábitos vocais",2],["eval_uso_profissional","Uso profissional da voz",2],["eval_laringoscopia","Laringoscopia / Exames complementares",2]]},
   "Motricidade Orofacial":{title:"Avaliação de Motricidade Orofacial",fields:[["eval_tonus","Tônus muscular (lábios, bochechas, língua, mandíbula)",3],["eval_mobilidade","Mobilidade de estruturas orofaciais",3],["eval_mastigacao","Mastigação (tipo, eficiência, lateralização)",3],["eval_degluticao","Deglutição de saliva / padrão deglutitório",3],["eval_respiracao","Modo respiratório (nasal/oral/misto)",2],["eval_postura","Postura de lábios e língua em repouso",2],["eval_habitos","Hábitos orais deletérios",2]]},
   "Deglutição / Disfagia":{title:"Avaliação de Deglutição / Disfagia",fields:[["eval_anamnese_deg","Histórico alimentar e queixas",3],["eval_oral_deg","Fase oral (preparo e ejeção do bolo)",3],["eval_faringea","Fase faríngea / sinais clínicos de aspiração",3],["eval_consistencias","Consistências testadas e respostas",3],["eval_sinais_aspiracao","Sinais de aspiração / Penetração laríngea",2],["eval_postura_deg","Posturas e manobras compensatórias",2],["eval_via_alimentar","Via de alimentação atual (VO/SNE/GTT)",2],["eval_exames_deg","Exames complementares (VED, VFSS)",2]]},
-✦✦✦✦✦✦✦✦✦✦✦
-
-"TEA":{title:"Avaliação Fonoaudiológica — TEA",fields:[["eval_comunicacao_tea","Perfil comunicativo (verbal/não verbal/minimamente verbal)",3],["eval_intencao","Intenção e iniciativa comunicativa",3],["eval_linguagem_tea","Compreensão e expressão de linguagem",3],["eval_ecolalia","Ecolalia (imediata/tardia/funcional)",2],["eval_pragmatica","Pragmática / Função social da comunicação",3],["eval_caa","Uso de CAA",2],["eval_brincar","Jogo simbólico e interação",2],["eval_sensorial","Perfil sensorial relacionado à comunicação",2]]},
+  "TEA":{title:"Avaliação Fonoaudiológica — TEA",fields:[["eval_comunicacao_tea","Perfil comunicativo (verbal/não verbal/minimamente verbal)",3],["eval_intencao","Intenção e iniciativa comunicativa",3],["eval_linguagem_tea","Compreensão e expressão de linguagem",3],["eval_ecolalia","Ecolalia (imediata/tardia/funcional)",2],["eval_pragmatica","Pragmática / Função social da comunicação",3],["eval_caa","Uso de CAA",2],["eval_brincar","Jogo simbólico e interação",2],["eval_sensorial","Perfil sensorial relacionado à comunicação",2]]},
   "Parkinson":{title:"Avaliação Fonoaudiológica — Parkinson",fields:[["eval_voz_park","Voz (hipofonia, monopitch, qualidade vocal)",3],["eval_articulacao","Articulação / Disartria hipocinética",3],["eval_velocidade","Velocidade de fala / Festinação verbal",2],["eval_deglut_park","Deglutição (fases oral e faríngea)",3],["eval_saliva","Manejo de saliva / Sialorreia",2],["eval_cognicao_park","Aspectos cognitivo-comunicativos",2],["eval_estadio","Estádio da doença (Hoehn e Yahr)",2],["eval_lsvt","Indicação para LSVT LOUD",2]]},
   "Alzheimer / Demências":{title:"Avaliação Fonoaudiológica — Alzheimer / Demências",fields:[["eval_estadio_alz","Estádio da demência (leve/moderado/grave)",2],["eval_compreensao","Compreensão verbal e não verbal",3],["eval_expressao","Expressão oral / Conteúdo informacional",3],["eval_memoria_ling","Memória de trabalho e linguagem",3],["eval_nomeacao","Nomeação / Anomia",2],["eval_discurso","Coerência e coesão do discurso",2],["eval_deglut_alz","Deglutição / Risco de aspiração",3],["eval_funcional","Comunicação funcional no cotidiano",2]]},
 };
@@ -232,9 +221,7 @@ function App(){
   function logout(){sessionStorage.removeItem(SESSION_KEY);setSess(null);setPatients([]);setAppts([]);}
 
   async function saveNewPt(){
-✦✦✦✦✦✦✦✦✦✦✦
-
-if(!newPt.name.trim())return; setSyncing(true);
+    if(!newPt.name.trim())return; setSyncing(true);
     const row={...newPt,id:Date.now(),created_at:new Date().toISOString()};
     await dbIns("patients",row);
     setPatients(p=>[{...row,evolutions:[]}, ...p]);
@@ -309,9 +296,7 @@ if(!newPt.name.trim())return; setSyncing(true);
         <form onSubmit={login} style={{marginTop:28}}>
           <div className="field"><span className="field-ico">✉</span><input type="email" placeholder="E-mail" value={eIn} onChange={e=>setEIn(e.target.value)} required/></div>
           <div className="field"><span className="field-ico">🔒</span><input type="password" placeholder="Senha" value={pIn} onChange={e=>setPIn(e.target.value)} required/></div>
-✦✦✦✦✦✦✦✦✦✦✦
-
-<button type="submit" className="btn-login" disabled={loading}>{loading?<><span className="sp2"/>Entrando...</>:"Entrar no NQ Fono"}</button>
+          <button type="submit" className="btn-login" disabled={loading}>{loading?<><span className="sp2"/>Entrando...</>:"Entrar no NQ Fono"}</button>
         </form>
         {err&&<div className="err">⚠ {err}</div>}
         <div className="sec"><div className="sec-dot"/>Acesso protegido · Dados na nuvem · LGPD-friendly</div>
@@ -377,9 +362,7 @@ if(!newPt.name.trim())return; setSyncing(true);
                   <span className="tag">{p.evolutions?.length||0} evol.</span>
                 </div>
               ))}
-              {patients.
-
-length===0&&<p style={{color:"var(--stone)",fontSize:".84rem"}}>Nenhum paciente ainda.</p>}
+              {patients.length===0&&<p style={{color:"var(--stone)",fontSize:".84rem"}}>Nenhum paciente ainda.</p>}
             </div>
             <div className="card">
               <div className="card-title">Acesso rápido</div>
@@ -429,8 +412,7 @@ length===0&&<p style={{color:"var(--stone)",fontSize:".84rem"}}>Nenhum paciente 
               {[["identificacao","Identificação"],["anamnese","Anamnese"],["avaliacao","Avaliação"],["evolucao","Evolução"],["documentos","Documentos"]].map(([k,l])=>(
                 <button key={k} className={`tab ${tab===k?"on":""}`} onClick={()=>setTab(k)}>{l}</button>
               ))}
-
-</div>
+            </div>
             <div className="card">
               {tab==="identificacao"&&<div className="fs"><h4>Dados do Paciente</h4>
                 <div className="g2" style={{gap:13}}>
@@ -474,9 +456,7 @@ length===0&&<p style={{color:"var(--stone)",fontSize:".84rem"}}>Nenhum paciente 
 
               {tab==="evolucao"&&<div>
                 <div className="fs"><h4>Nova Evolução</h4>
-✦✦✦✦✦✦✦✦✦✦✦
-
-<div style={{display:"flex",flexDirection:"column",gap:12}}>
+                  <div style={{display:"flex",flexDirection:"column",gap:12}}>
                     <div><label>Data</label><input className="inp" type="date" value={evo.date} onChange={e=>setEvo({...evo,date:e.target.value})}/></div>
                     <div><label>Objetivo terapêutico</label><textarea className="inp" rows={2} value={evo.objective} onChange={e=>setEvo({...evo,objective:e.target.value})}/></div>
                     <div><label>Conduta realizada</label><textarea className="inp" rows={3} value={evo.conduct} onChange={e=>setEvo({...evo,conduct:e.target.value})}/></div>
@@ -516,8 +496,7 @@ length===0&&<p style={{color:"var(--stone)",fontSize:".84rem"}}>Nenhum paciente 
                   <div style={{borderTop:"1px solid var(--mist)",paddingTop:16,marginTop:20}}><p style={{fontSize:".76rem",color:"var(--stone)"}}>Nayara Querino · Fonoaudióloga · CRFa 8-11873<br/>Documento confidencial. LGPD.</p></div>
                 </div>
                 <div style={{marginTop:13,display:"flex",gap:9,flexWrap:"wrap"}}>
-
-<button className="btn bo" onClick={()=>quickAI(`Redija relatório clínico fonoaudiológico para ${selPt.name} (${selPt.specialty||""}). Diagnóstico: ${selPt.eval_diagnosis||selPt.diagnosis||"a confirmar"}. Plano: ${selPt.therapy_plan||"em elaboração"}. Evolução: ${selPt.evolutions?.[0]?.conduct||"em acompanhamento"}.`)}>✨ Gerar com IA</button>
+                  <button className="btn bo" onClick={()=>quickAI(`Redija relatório clínico fonoaudiológico para ${selPt.name} (${selPt.specialty||""}). Diagnóstico: ${selPt.eval_diagnosis||selPt.diagnosis||"a confirmar"}. Plano: ${selPt.therapy_plan||"em elaboração"}. Evolução: ${selPt.evolutions?.[0]?.conduct||"em acompanhamento"}.`)}>✨ Gerar com IA</button>
                   <button className="btn bo" onClick={()=>window.print()}>🖨 Imprimir</button>
                 </div>
               </div>}
@@ -568,10 +547,7 @@ length===0&&<p style={{color:"var(--stone)",fontSize:".84rem"}}>Nenhum paciente 
               {aiLoad&&<div className="msg ma"><span className="ai-lbl">✨ Assistente IA NQ Fono</span><div className="ty"><span/><span/><span/></div></div>}
             </div>
             <div style={{display:"flex",gap:8}}>
-              <textarea className="inp" style={{flex:1,minHeight:44,maxHeight:110,resize:"vertical"}} placeholder="Descreva o que precisa...
-✦✦✦✦✦✦✦✦✦✦✦
-
-" value={aiIn} onChange={e=>setAiIn(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();sendAI();}}}/>
+              <textarea className="inp" style={{flex:1,minHeight:44,maxHeight:110,resize:"vertical"}} placeholder="Descreva o que precisa..." value={aiIn} onChange={e=>setAiIn(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();sendAI();}}}/>
               <button className="btn br" style={{alignSelf:"flex-end",padding:"11px 17px"}} onClick={()=>sendAI()} disabled={aiLoad}>{aiLoad?<><span className="sp2"/>...</>:"Enviar"}</button>
             </div>
             <p style={{fontSize:".7rem",color:"var(--mist)",marginTop:6}}>⚠ Textos gerados pela IA devem ser revisados antes do uso clínico.</p>
@@ -628,9 +604,8 @@ length===0&&<p style={{color:"var(--stone)",fontSize:".84rem"}}>Nenhum paciente 
           <button className="btn bo" onClick={()=>setShowNP(false)}>Cancelar</button>
         </div>
       </div></div>}
-✦✦✦✦✦✦✦✦✦✦✦
 
-{showNA&&<div className="ov" onClick={()=>setShowNA(false)}><div className="mo fade-up" onClick={e=>e.stopPropagation()}>
+      {showNA&&<div className="ov" onClick={()=>setShowNA(false)}><div className="mo fade-up" onClick={e=>e.stopPropagation()}>
         <h3>Nova Consulta</h3>
         <div style={{display:"flex",flexDirection:"column",gap:11}}>
           <div><label>Data</label><input className="inp" type="date" value={newA.date} onChange={e=>setNewA({...newA,date:e.target.value})}/></div>
@@ -652,5 +627,3 @@ ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
 </script>
 </body>
 </html>
-ENDHTML
-echo "Done! Size: $(wc -c < /mnt/user-data/outputs/index.html) bytes"
